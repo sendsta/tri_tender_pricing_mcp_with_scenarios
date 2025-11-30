@@ -2,7 +2,7 @@
 import os
 from typing import List, Optional, Literal, Dict, Any
 
-from fastmcp_http.server import FastMCPHttpServer
+from fastmcp import FastMCP
 
 from pricing_engine import (
     PricingItemInput,
@@ -11,9 +11,7 @@ from pricing_engine import (
     render_pricing_report_html,
 )
 
-
-# Create HTTP MCP server instance
-mcp = FastMCPHttpServer(
+mcp = FastMCP(
     "tri-tender-pricing-mcp",
     description=(
         "Public & private tender pricing engine for Tri-Tender. "
@@ -23,7 +21,7 @@ mcp = FastMCPHttpServer(
 )
 
 
-@mcp.tool()
+@mcp.tool
 def pricing_entrypoint(
     tender_id: str,
     tender_title: Optional[str] = None,
@@ -55,7 +53,6 @@ def pricing_entrypoint(
         "tender_type": tender_type,
     }
 
-    # If we don't have structured pricing requirements, instruct the orchestrator
     if not pricing_requirements:
         instructions = (
             "No structured pricing_requirements were provided to the "
@@ -105,7 +102,7 @@ def pricing_entrypoint(
     }
 
 
-@mcp.tool()
+@mcp.tool
 def build_pricing_model(
     pricing_items: List[Dict[str, Any]],
     strategy: Literal["low_cost", "balanced", "premium"] = "balanced",
@@ -138,7 +135,7 @@ def build_pricing_model(
     return pricing_table
 
 
-@mcp.tool()
+@mcp.tool
 def compare_pricing_scenarios(
     pricing_items: List[Dict[str, Any]],
     strategies: Optional[List[Literal["low_cost", "balanced", "premium"]]] = None,
@@ -154,46 +151,10 @@ def compare_pricing_scenarios(
     This tool uses the same engine as build_pricing_model but calculates
     multiple strategies in one call so that the user can see how pricing
     posture affects totals and risk.
-
-    Parameters
-    ----------
-    pricing_items:
-        List of pricing items, same structure as build_pricing_model.
-    strategies:
-        Optional list of strategies to compare. Default:
-        ["low_cost", "balanced", "premium"].
-    overhead_pct, profit_margin_pct, contingency_pct, tax_rate_pct, currency_symbol:
-        Same as build_pricing_model.
-
-    Returns
-    -------
-    dict:
-        {
-          "scenarios": {
-            "low_cost": { ...pricing model... },
-            "balanced": { ...pricing model... },
-            "premium": { ...pricing model... }
-          },
-          "comparison": {
-            "currency_symbol": "R",
-            "by_strategy": [
-              {
-                "strategy": "low_cost",
-                "total_excl_tax": ...,
-                "total_incl_tax": ...,
-                "profit_amount": ...,
-                "overhead_amount": ...,
-                "contingency_amount": ...
-              },
-              ...
-            ]
-          }
-        }
     """
     if strategies is None or len(strategies) == 0:
         strategies = ["low_cost", "balanced", "premium"]
 
-    # Normalize input items once
     typed_items: List[PricingItemInput] = [
         PricingItemInput(**item) for item in pricing_items
     ]
@@ -232,7 +193,7 @@ def compare_pricing_scenarios(
     }
 
 
-@mcp.tool()
+@mcp.tool
 def generate_pricing_report_html(
     tender_context: Dict[str, Any],
     company_context: Dict[str, Any],
@@ -264,5 +225,5 @@ def generate_pricing_report_html(
 
 
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", "8000"))
-    mcp.run_http(register_server=False, host="0.0.0.0", port=port)
+    port = int(os.getenv("PORT", "8080"))
+    mcp.run(transport="http", host="0.0.0.0", port=port)
