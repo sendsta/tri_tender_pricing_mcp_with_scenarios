@@ -11,14 +11,8 @@ from pricing_engine import (
     render_pricing_report_html,
 )
 
-mcp = FastMCP(
-    "tri-tender-pricing-mcp",
-    description=(
-        "Public & private tender pricing engine for Tri-Tender. "
-        "Works with tender-docs-mcp-file-resource to turn parsed pricing "
-        "requirements into a styled HTML pricing report and scenario analysis."
-    ),
-)
+# FastMCP server instance (Cloud will discover this as `mcp`)
+mcp = FastMCP(name="tri-tender-pricing-mcp")
 
 
 @mcp.tool
@@ -79,7 +73,7 @@ def pricing_entrypoint(
             "tender_context": tender_context,
         }
 
-    pricing_analysis = None
+    pricing_analysis = None    # optional notes/flags
     if parsed_pricing_spec_text:
         pricing_analysis = analyze_pricing_spec_text(
             parsed_pricing_spec_text,
@@ -225,5 +219,6 @@ def generate_pricing_report_html(
 
 
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", "8080"))
-    mcp.run(transport="http", host="0.0.0.0", port=port)
+    # Local run helper (stdio by default). FastMCP Cloud will ignore this
+    # and run the server via the FastMCP CLI.
+    mcp.run()

@@ -83,12 +83,9 @@ def build_pricing_table(
 
     overhead_amount = subtotal_direct_cost * (overhead_pct / 100.0)
     contingency_amount = subtotal_direct_cost * (contingency_pct / 100.0)
-    profit_amount = (subtotal_direct_cost + overhead_amount + contingency_amount) * (
-        profit_margin_pct / 100.0
-    )
-    total_excl_tax = (
-        subtotal_direct_cost + overhead_amount + contingency_amount + profit_amount
-    )
+    profit_base = subtotal_direct_cost + overhead_amount + contingency_amount
+    profit_amount = profit_base * (profit_margin_pct / 100.0)
+    total_excl_tax = subtotal_direct_cost + overhead_amount + contingency_amount + profit_amount
     tax_amount = total_excl_tax * (tax_rate_pct / 100.0)
     total_incl_tax = total_excl_tax + tax_amount
 
@@ -278,8 +275,8 @@ def render_pricing_report_html(
           <th>Unit</th>
           <th>Category</th>
           <th>Risk</th>
-          <th style="text-align:right;">Unit Cost</th>
-          <th style="text-align:right;">Line Total</th>
+          <th style='text-align:right;'>Unit Cost</th>
+          <th style='text-align:right;'>Line Total</th>
         </tr>
       </thead>
       <tbody>

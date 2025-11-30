@@ -1,9 +1,18 @@
 
-# Tri-Tender Pricing MCP (HTTP / FastMCP Cloud Ready)
+# Tri-Tender Pricing MCP (FastMCP-compatible)
 
-This is the Tri-Tender public & private **pricing MCP**, implemented using
-the core `fastmcp` server with HTTP transport so it runs cleanly on
-**FastMCP Cloud**.
+This is the Tri-Tender **public & private tender pricing MCP**, implemented
+with the core `fastmcp` server so that it runs cleanly on **FastMCP Cloud**.
+
+## Server object
+
+FastMCP Cloud will look for a `FastMCP` instance named **`mcp`**:
+
+```python
+from fastmcp import FastMCP
+
+mcp = FastMCP(name="tri-tender-pricing-mcp")
+```
 
 ## Tools
 
@@ -12,23 +21,19 @@ the core `fastmcp` server with HTTP transport so it runs cleanly on
 - `compare_pricing_scenarios`
 - `generate_pricing_report_html`
 
-## Running locally
+## Local run
 
 ```bash
 pip install -r requirements.txt
 python server.py
 ```
 
-The MCP endpoint will be available at:
-
-- `http://localhost:8080/mcp` (by default) or
-- `http://localhost:<PORT>/mcp` if you set `PORT` env var.
-
 ## FastMCP Cloud
 
-On FastMCP Cloud:
+In FastMCP Cloud, set the **Entrypoint** to:
 
-- Entrypoint: `server.py`
-- Python: 3.12
-- `fastmcp` will be detected automatically and `fastmcp inspect` works
-  out of the box.
+```text
+server.py:mcp
+```
+
+Python version: **3.12**
